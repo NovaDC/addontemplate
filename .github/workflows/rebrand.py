@@ -70,7 +70,8 @@ def rebrand(
     if tqdm is not None:
         tqdm.total = len(target_files)
 
-    for path in sorted(target_files, key = lambda p: (-len(p.parts), not p.is_dir())): #sort to ensure that paths furthest down the tree are renamed first, to avoid renaming a parent of a file that we later want to rename anyway...
+    for path in sorted(target_files, key = lambda p: (-len(p.parts), list(p.parts))): #sort to ensure that paths furthest down the tree are renamed first, to avoid renaming a parent of a file that we later want to rename anyway...
+        print(path)
         text = None
         text_replaced = False
         if path.is_file():
