@@ -6,7 +6,7 @@ from warnings import warn
 from tqdm import tqdm as TQDM
 from re import Pattern, compile
 
-SELF_EXPECTED_REPO_PATH: Path = Path("./.template/rebrand.py")
+SELF_EXPECTED_REPO_PATH: Path = Path("./.githubworkflows/rebrand.py")
 
 COMMON_READ_ERRORS = (
     ValueError,
@@ -70,7 +70,7 @@ def rebrand(
     if tqdm is not None:
         tqdm.total = len(target_files)
 
-    for path in sorted(target_files, key = lambda p: len(p.parts), reverse = True): #sort to ensure that paths furthest down the tree are renamed first, to avoid renaming a parent of a file that we later want to rename anyway...
+    for path in sorted(target_files, key = lambda p: (-len(p.parts), p.is_dir())): #sort to ensure that paths furthest down the tree are renamed first, to avoid renaming a parent of a file that we later want to rename anyway...
         text = None
         text_replaced = False
         if path.is_file():
@@ -94,6 +94,9 @@ def rebrand(
             if path != out_path:
                 # remove a old path if its different from the new path, this is safe since we have the new content in ram
                 path.unlink(True)
+            #for whatever reeason wt+ refuses to create files i fthey dont exist
+            if not out_path.parent.exists():
+                out_path.parent.mkdir(parents=True)
             with out_path.open("wt+", encoding=encoding, errors=errors) as f:
                 f.write(text)
             if tqdm is not None:
@@ -104,17 +107,17 @@ def rebrand(
             except FileExistsError as e:
                 if (not out_path.is_dir()) or (not path.is_dir()):
                     raise e
-                else:
-                    if path.is_file():
-                        path.unlink(False)
-                    else:
-                        path.rmdir()
+            if path.is_file():
+                path.unlink(False)
+            else:
+                path.rmdir()
             if tqdm is not None:
                 tqdm.update(1)
         else:  # huh, there was nothing to do on a path... but
             if path.is_file():
-                warn(
-                    f"File {path.relative_to(repo_root, walk_up=True)} has nothing to do! Is {path.relative_to(repo_root, walk_up=True)} a text file?")
+                pass
+                #warn(
+                #    f"File {path.relative_to(repo_root, walk_up=True)} has nothing to do! Is {path.relative_to(repo_root, walk_up=True)} a text file?")
             if tqdm is not None:
                 # this was an exception, dont count this file in the total...
                 tqdm.total -= 1
@@ -141,7 +144,7 @@ if True: #__name__ == "__main__":
     )
     p.add_argument("-e", "--encoding", type=str,
                    help="encoding to use for reading and writing files", default="utf-8")
-    p.add_argument("-b", "--blacklist", type=str, action="append", nargs="*",
+    p.add_argument("--blacklist", "-b", type=str, action="append", nargs="*", default = list(),
                    help="add paths to ignore, can be specified multiple times")
     p.add_argument("-t", "--tqdm", action="store_true")
     p.add_argument("--nq", "--no_quote_parsing", action="store_true")
@@ -166,7 +169,6 @@ if True: #__name__ == "__main__":
             content_name = None
 
         path_safe_name = match.group("SAFEVALUE")
-        print(path_safe_name)
         if path_safe_name is not None and len(path_safe_name) < 1:
             path_safe_name = None
 
@@ -203,6 +205,3 @@ if True: #__name__ == "__main__":
 
     if parsed.selfdestruct:
         self_destruct()
-
-
-    print("!!!!!!!!!", blacklist)
