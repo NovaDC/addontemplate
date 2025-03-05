@@ -107,10 +107,10 @@ def rebrand(
             except FileExistsError as e:
                 if (not out_path.is_dir()) or (not path.is_dir()):
                     raise e
-            if path.is_dir():
-                path.rmdir()
-            else:
-                path.unlink(False)
+                if path.is_dir():
+                    path.rmdir()
+                else:
+                    path.unlink(False)
             if tqdm is not None:
                 tqdm.update(1)
         else:  # huh, there was nothing to do on a path... but
