@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Run Python script
-        run: python3.12 ./.template/rebrand.py -r temp_name=r="${{github.event.repository.name}}" -r temp_version=r="v0.1.0.0" -r temp_desc=r="${{github.event.repository.description}}" -r temp_author=r="${{github.event.repository.owner.login}} -m -b .git/** .github/rebrand.yaml"
+        run: python3.12 ./.template/rebrand.py -r temp_name=r="${{github.event.repository.name}}" -r temp_version=r="v0.1.0.0" -r temp_desc=r="${{github.event.repository.description}}" -r temp_author=r="${{github.event.repository.owner.login}} -m -b .git/** .github/workflows/rebrand**"
       - name: Commit changes
         uses: EndBug/add-and-commit
         with:
