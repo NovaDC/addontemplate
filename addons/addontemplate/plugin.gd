@@ -1,8 +1,8 @@
 @tool
 extends EditorPlugin
 
-const PLUGIN_NAME := "temp_name"
-const PLUIGN_ICON := preload("res://addons/temp_name/icon.svg")
+const PLUGIN_NAME := "addontemplate"
+const PLUIGN_ICON := preload("res://addons/addontemplate/icon.svg")
 
 func _enter_tree() -> void:
 	if get_editor_interface().is_plugin_enabled(PLUGIN_NAME):
