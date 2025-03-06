@@ -19,4 +19,4 @@ jobs:
         uses: actions4git/add-commit-push@v1.0.0
         with:
           commit-message: "Rebranded template repo"
-          add-pathspec: !.github/workflows/**
+          add-pathspec: "!.github/workflows/**"
