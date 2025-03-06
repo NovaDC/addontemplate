@@ -19,6 +19,4 @@ jobs:
       - name: Commit changes
         uses: actions4git/add-commit-push@v1.0.0
         with:
-          commit-author: RebrandBot
-          commit-committer: RebrandBot
           commit-message: "Rebranded template repo"
