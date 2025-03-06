@@ -45,6 +45,7 @@ def rebrand(
     errors: Optional[str] = None,
 ):
     filename_pattern_blacklist = set(chain.from_iterable(repo_root.rglob(bl if isinstance(bl, str) else str(bl.absolute())) for bl in filename_pattern_blacklist)) | {this_path()}
+    print(filename_pattern_blacklist)
 
     final_mapping: Dict[Pattern, Tuple[Optional[str], Optional[str]]] = {}
 
@@ -67,7 +68,7 @@ def rebrand(
         return
 
     # collect only reasonably possible targets is a way that we can count ho many thier are (not a itnerable, something sized)
-    target_files: Set[Path] = set(f for f in repo_root.rglob("*") if f not in filename_pattern_blacklist and not any((bl in f.parents) for bl in filename_pattern_blacklist))
+    target_files: Set[Path] = set(f for f in repo_root.rglob("*") if f.absolute() not in filename_pattern_blacklist and not any((bl in f.absolute().parents) for bl in filename_pattern_blacklist))
 
     if tqdm is not None:
         tqdm.total = len(target_files)
