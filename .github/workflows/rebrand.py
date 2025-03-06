@@ -2,6 +2,7 @@ from functools import cache
 from itertools import chain
 from os import renames
 from pathlib import Path
+from shutil import move
 from typing import Dict, Iterable, Set, Union, Tuple, Optional, List
 from warnings import warn
 from tqdm import tqdm as TQDM
@@ -105,7 +106,7 @@ def rebrand(
                 tqdm.update(1)
         elif path != out_path:
             try:
-                renames(path, out_path)
+                move(path, out_path)
 
             except FileExistsError as e:
                 if (not out_path.is_dir()) or (not path.is_dir()):
