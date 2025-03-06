@@ -2,9 +2,7 @@ name: Rebrand
 on: push
 jobs:
   run-python-script:
-    permissions:
-      contents: write
-      actions: write
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
