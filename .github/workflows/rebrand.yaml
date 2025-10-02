@@ -1,22 +1,39 @@
-name: Rebrand
-on: push
+name: Apply project template
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
 jobs:
-  run-python-script:
-    permissions: write-all
+  apply:
+    if: ${{ hashFiles('./github/workflows/TEMPLATE_APPLIED') == '' }}
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.2.2
-      - name: Set up Python
-        uses: actions/setup-python@v5.4.0
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          python-version: '3.12'
-      - name: Install deps
-        run: pip install tqdm
-      - name: Run the script
-        run: python3.12 .github/workflows/rebrand.py -r temp_name=r="${{github.event.repository.name}}" -r temp_version=r="v0.1.0.0" -r temp_desc=r="${{github.event.repository.description}}" -r temp_author=r="${{github.event.repository.owner.login}}" -m -b .git/** -b .github/workflows/**
-      - name: Commit changes
-        uses: actions4git/add-commit-push@v1.0.0
-        with:
-          commit-message: "Rebranded template repo"
-          add-pathspec: ":!.github/workflows/*"
+          fetch-depth: 0
+
+      - name: Make helper executable
+        run: chmod +x ./github/workflows/rebrand.sh
+
+      - name: Run replacement script
+        run: |
+          ./github/workflows/rebrand.sh \
+            "temp_name=${{ github.event.repository.name }}" \
+            "temp_desc=${{ github.event.repository.description }}" \
+            "temp_author=${{ github.event.repository.owner.login }}" \
+            "temp_ver=v0.1.0.0"\
+            "temp_gd_min=4.2"
+
+      - name: Commit changes & disable workflow
+        run: |
+          git config user.name  "Template Bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          echo "Template applied on $(date --iso-8601=seconds)" > ./github/workflows/TEMPLATE_APPLIED
+          git add -A
+          git commit -m "ci: apply template & disable workflow [skip ci]"
+          git push
